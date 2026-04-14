@@ -4,6 +4,8 @@ from app.config import (
     DEFAULT_CHUNK_OVERLAP,
     DEFAULT_TOP_K,
     DEFAULT_ALLOWED_ORIGINS,
+    DEFAULT_VECTOR_STORE_PATH,
+    DEFAULT_EMBEDDING_DIM,
 )
 
 class Settings:
@@ -15,5 +17,7 @@ class Settings:
         self.ALLOWED_ORIGINS = os.getenv(
             "ALLOWED_ORIGINS", ",".join(DEFAULT_ALLOWED_ORIGINS)
         ).split(",")
+        self.VECTOR_STORE_PATH = os.getenv("VECTOR_STORE_PATH", DEFAULT_VECTOR_STORE_PATH)
+        self.EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", DEFAULT_EMBEDDING_DIM))
 
 settings = Settings()
