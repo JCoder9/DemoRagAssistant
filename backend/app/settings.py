@@ -5,6 +5,8 @@ from app.config import (
     DEFAULT_TOP_K,
     DEFAULT_ALLOWED_ORIGINS,
     DEFAULT_EMBEDDING_MODEL,
+    DEFAULT_VECTOR_STORE_PATH,
+    DEFAULT_EMBEDDING_DIM,
 )
 
 class Settings:
@@ -17,5 +19,7 @@ class Settings:
             "ALLOWED_ORIGINS", ",".join(DEFAULT_ALLOWED_ORIGINS)
         ).split(",")
         self.EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL)
+        self.VECTOR_STORE_PATH = os.getenv("VECTOR_STORE_PATH", DEFAULT_VECTOR_STORE_PATH)
+        self.EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", DEFAULT_EMBEDDING_DIM))
 
 settings = Settings()

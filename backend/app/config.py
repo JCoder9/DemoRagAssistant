@@ -3,3 +3,5 @@ DEFAULT_CHUNK_OVERLAP = 50
 DEFAULT_TOP_K = 5
 DEFAULT_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173"]
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
+DEFAULT_VECTOR_STORE_PATH = "storage/vector_store"
+DEFAULT_EMBEDDING_DIM = 1536
