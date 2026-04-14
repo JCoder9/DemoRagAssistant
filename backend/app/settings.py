@@ -4,6 +4,7 @@ from app.config import (
     DEFAULT_CHUNK_OVERLAP,
     DEFAULT_TOP_K,
     DEFAULT_ALLOWED_ORIGINS,
+    DEFAULT_EMBEDDING_MODEL,
 )
 
 class Settings:
@@ -15,5 +16,6 @@ class Settings:
         self.ALLOWED_ORIGINS = os.getenv(
             "ALLOWED_ORIGINS", ",".join(DEFAULT_ALLOWED_ORIGINS)
         ).split(",")
+        self.EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL)
 
 settings = Settings()
