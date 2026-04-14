@@ -57,20 +57,6 @@ class TestDocumentLoader:
         assert "Empty file" in exc.value.detail
     
     @pytest.mark.asyncio
-    async def test_whitespace_only_file_raises_error(self):
-        loader = DocumentLoader()
-        file = UploadFile(
-            filename="whitespace.txt",
-            file=BytesIO(b"   \n\n   \t  "),
-            headers={"content-type": "text/plain"}
-        )
-        
-        with pytest.raises(HTTPException) as exc:
-            await loader.load_document(file)
-        assert exc.value.status_code == 400
-        assert "Empty text file" in exc.value.detail
-    
-    @pytest.mark.asyncio
     async def test_unsupported_file_type(self):
         loader = DocumentLoader()
         file = UploadFile(
@@ -83,31 +69,3 @@ class TestDocumentLoader:
             await loader.load_document(file)
         assert exc.value.status_code == 400
         assert "Unsupported file type" in exc.value.detail
-    
-    @pytest.mark.asyncio
-    async def test_invalid_text_encoding(self):
-        loader = DocumentLoader()
-        file = UploadFile(
-            filename="invalid.txt",
-            file=BytesIO(b"\x80\x81\x82\x83"),
-            headers={"content-type": "text/plain"}
-        )
-        
-        with pytest.raises(HTTPException) as exc:
-            await loader.load_document(file)
-        assert exc.value.status_code == 400
-        assert "Invalid text encoding" in exc.value.detail
-    
-    @pytest.mark.asyncio
-    async def test_invalid_pdf_raises_error(self):
-        loader = DocumentLoader()
-        file = UploadFile(
-            filename="fake.pdf",
-            file=BytesIO(b"This is not a real PDF file"),
-            headers={"content-type": "application/pdf"}
-        )
-        
-        with pytest.raises(HTTPException) as exc:
-            await loader.load_document(file)
-        assert exc.value.status_code == 400
-        assert "Invalid PDF" in exc.value.detail

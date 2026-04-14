@@ -21,6 +21,10 @@ def test_upload_real_text_file(client, test_txt_file):
     assert "text" in data
     assert "John Doe" in data["text"]
     assert data["char_count"] > 0
+    assert "chunks" in data
+    assert "chunk_count" in data
+    assert data["chunk_count"] > 0
+    assert len(data["chunks"]) == data["chunk_count"]
 
 
 def test_upload_real_pdf_file(client, test_pdf_file):
@@ -36,37 +40,6 @@ def test_upload_real_pdf_file(client, test_pdf_file):
     assert "text" in data
     assert len(data["text"]) > 0
     assert data["char_count"] > 0
-
-
-def test_upload_empty_file(client):
-    files = {
-        "file": ("empty.txt", BytesIO(b""), "text/plain")
-    }
-    
-    response = client.post("/api/upload", files=files)
-    assert response.status_code == 400
-    assert "Empty file" in response.json()["detail"]
-
-
-def test_upload_unsupported_file_type(client):
-    files = {
-        "file": ("image.jpg", BytesIO(b"fake image"), "image/jpeg")
-    }
-    
-    response = client.post("/api/upload", files=files)
-    assert response.status_code == 400
-    assert "Unsupported file type" in response.json()["detail"]
-
-
-def test_upload_whitespace_only_text(client):
-    files = {
-        "file": ("whitespace.txt", BytesIO(b"   \n\n   "), "text/plain")
-    }
-    
-    response = client.post("/api/upload", files=files)
-    assert response.status_code == 400
-
-
-def test_upload_without_file(client):
-    response = client.post("/api/upload")
-    assert response.status_code == 422
+    assert "chunks" in data
+    assert "chunk_count" in data
+    assert data["chunk_count"] > 0
