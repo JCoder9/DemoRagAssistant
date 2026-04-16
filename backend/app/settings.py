@@ -7,6 +7,8 @@ from app.config import (
     DEFAULT_EMBEDDING_MODEL,
     DEFAULT_VECTOR_STORE_PATH,
     DEFAULT_EMBEDDING_DIM,
+    DEFAULT_CHAT_MODEL,
+    DEFAULT_TEMPERATURE,
 )
 
 class Settings:
@@ -21,5 +23,7 @@ class Settings:
         self.EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL)
         self.VECTOR_STORE_PATH = os.getenv("VECTOR_STORE_PATH", DEFAULT_VECTOR_STORE_PATH)
         self.EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", DEFAULT_EMBEDDING_DIM))
+        self.CHAT_MODEL = os.getenv("CHAT_MODEL", DEFAULT_CHAT_MODEL)
+        self.TEMPERATURE = float(os.getenv("TEMPERATURE", DEFAULT_TEMPERATURE))
 
 settings = Settings()
