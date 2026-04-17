@@ -9,6 +9,7 @@ from app.config import (
     DEFAULT_EMBEDDING_DIM,
     DEFAULT_CHAT_MODEL,
     DEFAULT_TEMPERATURE,
+    DEFAULT_CHAT_HISTORY_LIMIT,
 )
 
 class Settings:
@@ -25,5 +26,6 @@ class Settings:
         self.EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", DEFAULT_EMBEDDING_DIM))
         self.CHAT_MODEL = os.getenv("CHAT_MODEL", DEFAULT_CHAT_MODEL)
         self.TEMPERATURE = float(os.getenv("TEMPERATURE", DEFAULT_TEMPERATURE))
+        self.CHAT_HISTORY_LIMIT = int(os.getenv("CHAT_HISTORY_LIMIT", DEFAULT_CHAT_HISTORY_LIMIT))
 
 settings = Settings()

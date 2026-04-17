@@ -164,3 +164,34 @@ class TestRAGPipeline:
         assert result["sources"][0]["text"] == "Test without metadata"
         assert result["sources"][0]["score"] == 0.1
         assert "metadata" not in result["sources"][0]
+    
+    @pytest.mark.asyncio
+    async def test_query_with_chat_history(self, mock_embedding_service, mock_vector_store, mock_openai_client):
+        mock_vector_store.search.return_value = [
+            {"text": "Python supports multiple programming paradigms", "score": 0.1}
+        ]
+        
+        chat_history = [
+            {"role": "user", "content": "What is Python?"},
+            {"role": "assistant", "content": "Python is a programming language."}
+        ]
+        
+        pipeline = RAGPipeline(
+            embedding_service=mock_embedding_service,
+            vector_store=mock_vector_store,
+            client=mock_openai_client
+        )
+        
+        await pipeline.query("What paradigms does it support?", chat_history=chat_history)
+        
+        call_args = mock_openai_client.chat.completions.create.call_args
+        messages = call_args.kwargs["messages"]
+        
+        assert len(messages) == 4
+        assert messages[0]["role"] == "system"
+        assert messages[1]["role"] == "user"
+        assert messages[1]["content"] == "What is Python?"
+        assert messages[2]["role"] == "assistant"
+        assert messages[2]["content"] == "Python is a programming language."
+        assert messages[3]["role"] == "user"
+        assert "What paradigms does it support?" in messages[3]["content"]

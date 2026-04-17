@@ -25,7 +25,8 @@ class RAGPipeline:
     async def query(
         self, 
         question: str, 
-        top_k: Optional[int] = None
+        top_k: Optional[int] = None,
+        chat_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict:
         k = top_k or self.top_k
         
@@ -50,18 +51,24 @@ class RAGPipeline:
         
         prompt = self._build_prompt(question, context)
         
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that answers questions based only on the provided context. If the answer cannot be found in the context, say 'I cannot answer this based on the provided context.'"
+            }
+        ]
+        
+        if chat_history:
+            messages.extend(chat_history)
+        
+        messages.append({
+            "role": "user",
+            "content": prompt
+        })
+        
         response = self.client.chat.completions.create(
             model=self.chat_model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant that answers questions based only on the provided context. If the answer cannot be found in the context, say 'I cannot answer this based on the provided context.'"
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
+            messages=messages,
             temperature=self.temperature
         )
         
