@@ -1,5 +1,5 @@
 import pytest
-from io import BytesIO
+from unittest.mock import AsyncMock, Mock, patch
 
 
 def test_health_endpoint(client):
@@ -8,7 +8,22 @@ def test_health_endpoint(client):
     assert response.json() == {"status": "ok"}
 
 
-def test_upload_real_text_file(client, test_txt_file):
+@patch("app.services.upload_service.EmbeddingService")
+@patch("app.services.upload_service.VectorStore")
+def test_upload_real_text_file(mock_vector_store_class, mock_embedding_service_class, client, test_txt_file, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-123")
+    
+    mock_embedding_service = Mock()
+    mock_embedding_service.generate_embeddings = AsyncMock(return_value=[
+        {"embedding": [0.1] * 1536, "text": "chunk1", "index": 0}
+    ])
+    mock_embedding_service_class.return_value = mock_embedding_service
+    
+    mock_vector_store = Mock()
+    mock_vector_store.add_documents = Mock()
+    mock_vector_store.save_index = Mock()
+    mock_vector_store_class.return_value = mock_vector_store
+    
     with open(test_txt_file, "rb") as f:
         files = {
             "file": ("test.txt", f, "text/plain")
@@ -18,16 +33,32 @@ def test_upload_real_text_file(client, test_txt_file):
     assert response.status_code == 200
     data = response.json()
     assert data["filename"] == "test.txt"
-    assert "text" in data
-    assert "John Doe" in data["text"]
     assert data["char_count"] > 0
-    assert "chunks" in data
-    assert "chunk_count" in data
     assert data["chunk_count"] > 0
-    assert len(data["chunks"]) == data["chunk_count"]
+    assert "message" in data
+    assert "Successfully processed" in data["message"]
+    
+    mock_embedding_service.generate_embeddings.assert_called_once()
+    mock_vector_store.add_documents.assert_called_once()
+    mock_vector_store.save_index.assert_called_once()
 
 
-def test_upload_real_pdf_file(client, test_pdf_file):
+@patch("app.services.upload_service.EmbeddingService")
+@patch("app.services.upload_service.VectorStore")
+def test_upload_real_pdf_file(mock_vector_store_class, mock_embedding_service_class, client, test_pdf_file, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key-123")
+    
+    mock_embedding_service = Mock()
+    mock_embedding_service.generate_embeddings = AsyncMock(return_value=[
+        {"embedding": [0.1] * 1536, "text": "chunk1", "index": 0}
+    ])
+    mock_embedding_service_class.return_value = mock_embedding_service
+    
+    mock_vector_store = Mock()
+    mock_vector_store.add_documents = Mock()
+    mock_vector_store.save_index = Mock()
+    mock_vector_store_class.return_value = mock_vector_store
+    
     with open(test_pdf_file, "rb") as f:
         files = {
             "file": ("test.pdf", f, "application/pdf")
@@ -37,9 +68,6 @@ def test_upload_real_pdf_file(client, test_pdf_file):
     assert response.status_code == 200
     data = response.json()
     assert data["filename"] == "test.pdf"
-    assert "text" in data
-    assert len(data["text"]) > 0
     assert data["char_count"] > 0
-    assert "chunks" in data
-    assert "chunk_count" in data
     assert data["chunk_count"] > 0
+    assert "message" in data

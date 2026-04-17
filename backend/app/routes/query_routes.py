@@ -11,6 +11,7 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     sources: list[dict]
+    context_used: list[str]
 
 query_service = QueryService()
 
