@@ -36,7 +36,7 @@ class VectorStore:
         
         embeddings_array = np.array(embeddings, dtype=np.float32)
         
-        if embeddings_array.shape[1] != self.dimension:
+        if embeddings_array.shape[1] != self.dimension: #check embedding_array number of columns matches index dimension
             raise ValueError(f"Embedding dimension {embeddings_array.shape[1]} does not match index dimension {self.dimension}")
         
         self.index.add(embeddings_array)
