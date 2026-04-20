@@ -4,6 +4,7 @@ phases/
 # env files
 .env
 .env.*
+!.env.example
 
 # keys
 *.key
@@ -43,3 +44,18 @@ logs/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# other
+backend/CPU_OPTIMIZATION.md
+
+backend/run_tests_batched.sh 
+backend/run_tests_low_memory.sh 
+backend/switch_settings.sh
