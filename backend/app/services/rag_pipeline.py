@@ -69,7 +69,8 @@ class RAGPipeline:
         response = self.client.chat.completions.create(
             model=self.chat_model,
             messages=messages,
-            temperature=self.temperature
+            temperature=self.temperature,
+            max_tokens=settings.MAX_TOKENS
         )
         
         answer = response.choices[0].message.content

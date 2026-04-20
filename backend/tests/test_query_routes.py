@@ -7,6 +7,14 @@ def mock_openai_api_key(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "test-key-123")
 
 
+@pytest.fixture(autouse=True)
+def mock_rate_limiter():
+    with patch("app.routes.query_routes.rate_limiter") as mock:
+        mock.check_rate_limit.return_value = (True, "")
+        mock.record_request.return_value = None
+        yield mock
+
+
 @patch("app.services.query_service.RAGPipeline")
 def test_query_endpoint_with_results(mock_rag_pipeline_class, client):
     mock_pipeline = Mock()
@@ -119,3 +127,27 @@ def test_query_endpoint_with_session_id(mock_rag_pipeline_class, mock_chat_memor
     assert mock_memory.add_message.call_count == 2
     mock_memory.add_message.assert_any_call("test-session-123", "user", "Follow-up question")
     mock_memory.add_message.assert_any_call("test-session-123", "assistant", "Test answer with history")
+
+
+@patch("app.services.query_service.RAGPipeline")
+def test_query_length_validation(mock_rag_pipeline_class, client):
+    long_question = "x" * 1000
+    
+    response = client.post("/api/query", json={
+        "question": long_question
+    })
+    
+    assert response.status_code == 400
+    assert "exceeds maximum length" in response.json()["detail"]
+
+
+@patch("app.services.query_service.RAGPipeline")
+def test_rate_limit_enforcement(mock_rag_pipeline_class, mock_rate_limiter, client):
+    mock_rate_limiter.check_rate_limit.return_value = (False, "Hourly demo limit reached. Please try again later.")
+    
+    response = client.post("/api/query", json={
+        "question": "Test question"
+    })
+    
+    assert response.status_code == 429
+    assert "Hourly demo limit reached" in response.json()["detail"]
