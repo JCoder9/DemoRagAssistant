@@ -56,6 +56,9 @@ yarn-error.log*
 dist/
 build/
 
+# Firebase
+.firebase/
+
 # other
 backend/CPU_OPTIMIZATION.md
 
