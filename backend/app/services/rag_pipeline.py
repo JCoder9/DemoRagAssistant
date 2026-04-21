@@ -46,15 +46,15 @@ class RAGPipeline:
                 raise ValueError("OPENAI_API_KEY not configured")
             self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
         
-        context_chunks = [result["text"] for result in search_results]
-        context = "\n\n".join(context_chunks)
+        # Build context with source attribution
+        context = self._build_context_with_sources(search_results)
         
         prompt = self._build_prompt(question, context)
         
         messages = [
             {
                 "role": "system",
-                "content": "You are a helpful assistant that answers questions based only on the provided context. If the answer cannot be found in the context, say 'I cannot answer this based on the provided context.'"
+                "content": "You are a helpful assistant that answers questions based on the provided context. Use the context to provide accurate answers. If the context doesn't contain relevant information to answer the question, acknowledge this limitation."
             }
         ]
         
@@ -76,7 +76,9 @@ class RAGPipeline:
         answer = response.choices[0].message.content
         
         sources = []
+        context_chunks = []
         for result in search_results:
+            context_chunks.append(result["text"])
             source = {
                 "text": result["text"],
                 "score": result["score"]
@@ -91,10 +93,22 @@ class RAGPipeline:
             "context_used": context_chunks
         }
     
+    def _build_context_with_sources(self, search_results: List[Dict]) -> str:
+        """Build context string with source attribution for each chunk."""
+        context_parts = []
+        for i, result in enumerate(search_results, 1):
+            source_name = "Unknown"
+            if "metadata" in result and "source" in result["metadata"]:
+                source_name = result["metadata"]["source"]
+            
+            context_parts.append(f"[Source: {source_name}]\n{result['text']}")
+        
+        return "\n\n".join(context_parts)
+    
     def _build_prompt(self, question: str, context: str) -> str:
         return f"""Context:
 {context}
 
 Question: {question}
 
-Answer the question based only on the context provided above. If the context doesn't contain enough information to answer the question, say so clearly."""
+Answer the question using the context provided above. Be concise and accurate."""
