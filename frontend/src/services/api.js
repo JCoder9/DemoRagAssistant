@@ -37,6 +37,32 @@ class ApiService {
 
     return response.json()
   }
+
+  async deleteDocument(filename) {
+    const response = await fetch(`${config.apiUrl}/api/documents/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Delete failed')
+    }
+
+    return response.json()
+  }
+
+  async getUploadedFiles() {
+    const response = await fetch(`${config.apiUrl}/api/documents`, {
+      method: 'GET',
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to fetch files')
+    }
+
+    return response.json()
+  }
 }
 
 export default new ApiService()

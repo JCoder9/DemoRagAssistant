@@ -83,4 +83,68 @@ describe('ApiService', () => {
       ).rejects.toThrow('File too large')
     })
   })
+
+  describe('deleteDocument', () => {
+    it('deletes document with correct filename', async () => {
+      const mockResponse = { message: 'Document removed', chunks_removed: 5 }
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse
+      })
+
+      const result = await apiService.deleteDocument('test.pdf')
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/documents/test.pdf'),
+        expect.objectContaining({
+          method: 'DELETE'
+        })
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('throws error on delete failure', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: 'Document not found' })
+      })
+
+      await expect(
+        apiService.deleteDocument('test.pdf')
+      ).rejects.toThrow('Document not found')
+    })
+  })
+
+  describe('getUploadedFiles', () => {
+    it('fetches list of uploaded files', async () => {
+      const mockResponse = { files: ['test.pdf', 'document.txt'], count: 2 }
+
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse
+      })
+
+      const result = await apiService.getUploadedFiles()
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/documents'),
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('throws error on fetch failure', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: 'Failed to retrieve files' })
+      })
+
+      await expect(
+        apiService.getUploadedFiles()
+      ).rejects.toThrow('Failed to retrieve files')
+    })
+  })
 })
