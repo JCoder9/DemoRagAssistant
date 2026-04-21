@@ -40,12 +40,27 @@ function FileUpload({ onUploadSuccess, onUploadError }) {
     }
 
     setUploading(true)
+    
+    // Show warning for potentially slow first upload
+    const uploadStartTime = Date.now()
+    const slowUploadTimer = setTimeout(() => {
+      onUploadError('Upload is taking longer than usual. Free-tier server may be waking up, please wait...')
+    }, 10000) // Show after 10 seconds
+
     try {
       const result = await apiService.uploadFile(file)
+      clearTimeout(slowUploadTimer)
       setUploadedFiles(prev => [...prev, { name: file.name, type: file.type, uploadedAt: new Date() }])
       onUploadSuccess(result.message || 'File uploaded successfully', result.uploads_remaining)
     } catch (error) {
-      onUploadError(error.message)
+      clearTimeout(slowUploadTimer)
+      
+      // Provide helpful error messages
+      if (error.message.includes('timeout') || error.message.includes('failed to fetch')) {
+        onUploadError('Upload timed out. Free-tier server may be waking up - please try again in 30 seconds.')
+      } else {
+        onUploadError(error.message)
+      }
     } finally {
       setUploading(false)
       if (fileInputRef.current) {
@@ -89,7 +104,12 @@ function FileUpload({ onUploadSuccess, onUploadError }) {
       setUploadedFiles(prev => prev.filter((_, i) => i !== index))
       onUploadSuccess(`Removed ${filename}`)
     } catch (error) {
-      onUploadError(error.message)
+      // Provide helpful error messages for timeouts
+      if (error.message.includes('timeout') || error.message.includes('failed to fetch')) {
+        onUploadError('Upload timed out. Free-tier server may be waking up - please try again in 30 seconds.')
+      } else {
+        onUploadError(error.message)
+      }
     } finally {
       setRemoving(null)
     }
