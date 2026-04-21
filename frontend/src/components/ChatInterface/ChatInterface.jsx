@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import apiService from '../services/api'
+import apiService from '../../services/api'
+import FileUpload from '../FileUpload'
 import './ChatInterface.css'
 
 function ChatInterface() {
@@ -7,6 +8,20 @@ function ChatInterface() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId] = useState(() => `session-${Date.now()}`)
+  const [notification, setNotification] = useState(null)
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => setNotification(null), 4000)
+  }
+
+  const handleUploadSuccess = (message) => {
+    showNotification(message, 'success')
+  }
+
+  const handleUploadError = (message) => {
+    showNotification(message, 'error')
+  }
 
   const sendMessage = async (e) => {
     e.preventDefault()
@@ -42,6 +57,19 @@ function ChatInterface() {
       <div className="chat-header">
         <h1>Demo RAG Assistant</h1>
         <p>Ask questions about your documents</p>
+      </div>
+
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
+      <div className="upload-section">
+        <FileUpload 
+          onUploadSuccess={handleUploadSuccess}
+          onUploadError={handleUploadError}
+        />
       </div>
 
       <div className="messages">
