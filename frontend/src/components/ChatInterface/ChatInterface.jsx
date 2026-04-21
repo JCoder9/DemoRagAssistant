@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import apiService from '../../services/api'
 import FileUpload from '../FileUpload'
 import './ChatInterface.css'
@@ -10,6 +10,15 @@ function ChatInterface() {
   const [sessionId] = useState(() => `session-${Date.now()}`)
   const [notification, setNotification] = useState(null)
   const [uploadsRemaining, setUploadsRemaining] = useState(null)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, loading])
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type })
@@ -61,7 +70,7 @@ function ChatInterface() {
     <div className="chat-container">
       <div className="chat-header">
         <h1>Demo RAG Assistant</h1>
-        <p>Ask questions about your documents</p>
+        <p>Ask questions about your documents (PDF & TXT files)</p>
       </div>
 
       {notification && (
@@ -133,6 +142,7 @@ function ChatInterface() {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       <form className="input-form" onSubmit={sendMessage}>
