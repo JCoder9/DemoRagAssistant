@@ -1,0 +1,98 @@
+.upload-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8fafc;
+  margin-bottom: 1rem;
+}
+
+.upload-zone:hover:not(.uploading) {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.upload-zone.drag-active {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  border-style: solid;
+}
+
+.upload-zone.uploading {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+}
+
+.upload-content svg {
+  color: #94a3b8;
+}
+
+.upload-zone:hover:not(.uploading) .upload-content svg {
+  color: #667eea;
+}
+
+.upload-content p {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.upload-content small {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .upload-zone {
+    padding: 1.25rem;
+  }
+
+  .upload-content p {
+    font-size: 0.875rem;
+  }
+
+  .upload-content small {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-zone {
+    padding: 1rem;
+  }
+
+  .upload-content svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+  }
+}
