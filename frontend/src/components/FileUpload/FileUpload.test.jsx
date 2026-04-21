@@ -12,6 +12,12 @@ describe('FileUpload', () => {
     fetch.mockClear()
     mockOnSuccess.mockClear()
     mockOnError.mockClear()
+    
+    // Mock getUploadedFiles call on mount
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ files: [], count: 0 })
+    })
   })
 
   it('renders upload zone with correct text', () => {
@@ -22,8 +28,7 @@ describe('FileUpload', () => {
       />
     )
 
-    expect(screen.getByText(/Drop a file or click to upload/i)).toBeInTheDocument()
-    expect(screen.getByText(/PDF or TXT files only/i)).toBeInTheDocument()
+    expect(screen.getByText(/Drop file or click to upload/i)).toBeInTheDocument()
   })
 
   it('shows error for invalid file type', async () => {
@@ -45,9 +50,10 @@ describe('FileUpload', () => {
   })
 
   it('calls onUploadSuccess when upload succeeds', async () => {
+    // Additional mock for the upload API call
     fetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ message: 'Upload successful' })
+      json: async () => ({ message: 'Upload successful', uploads_remaining: 4 })
     })
 
     render(
@@ -63,11 +69,12 @@ describe('FileUpload', () => {
     fireEvent.change(input, { target: { files: [file] } })
 
     await waitFor(() => {
-      expect(mockOnSuccess).toHaveBeenCalledWith('Upload successful')
+      expect(mockOnSuccess).toHaveBeenCalledWith('Upload successful', 4)
     })
   })
 
   it('calls onUploadError when upload fails', async () => {
+    // Additional mock for the upload API call
     fetch.mockResolvedValueOnce({
       ok: false,
       json: async () => ({ detail: 'File too large' })
@@ -94,9 +101,10 @@ describe('FileUpload', () => {
     let resolveUpload
     const uploadPromise = new Promise(resolve => { resolveUpload = resolve })
 
+    // Additional mock for the upload API call
     fetch.mockReturnValueOnce(uploadPromise.then(() => ({
       ok: true,
-      json: async () => ({ message: 'Success' })
+      json: async () => ({ message: 'Success', uploads_remaining: 4 })
     })))
 
     render(
