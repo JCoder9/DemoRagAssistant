@@ -10,6 +10,7 @@ function ChatInterface() {
   const [sessionId] = useState(() => `session-${Date.now()}`)
   const [notification, setNotification] = useState(null)
   const [uploadsRemaining, setUploadsRemaining] = useState(null)
+  const [isFirstRequest, setIsFirstRequest] = useState(true)
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -47,6 +48,12 @@ function ChatInterface() {
     setInput('')
     setLoading(true)
 
+    // Show cold start warning on first request
+    if (isFirstRequest) {
+      showNotification('First request may take 30-60 seconds as the free-tier server wakes up...', 'info')
+      setIsFirstRequest(false)
+    }
+
     try {
       const data = await apiService.query(question, sessionId)
       const assistantMessage = {
@@ -61,6 +68,11 @@ function ChatInterface() {
         content: error.message,
       }
       setMessages(prev => [...prev, errorMessage])
+      
+      // Show helpful message for timeout errors
+      if (error.message.includes('timeout') || error.message.includes('failed to fetch')) {
+        showNotification('Free-tier server is waking up. Please try again in a few seconds.', 'error')
+      }
     } finally {
       setLoading(false)
     }

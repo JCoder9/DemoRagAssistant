@@ -62,3 +62,4 @@ backend/CPU_OPTIMIZATION.md
 backend/run_tests_batched.sh 
 backend/run_tests_low_memory.sh 
 backend/switch_settings.sh
+test-docker.sh

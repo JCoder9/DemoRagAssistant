@@ -84,6 +84,12 @@
   border: 1px solid #fca5a5;
 }
 
+.notification.info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
 .upload-section {
   padding: 0.75rem 1.5rem 0.5rem;
 }
