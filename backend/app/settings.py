@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from app.config import (
     DEFAULT_CHUNK_SIZE,
     DEFAULT_CHUNK_OVERLAP,
@@ -19,6 +20,8 @@ from app.config import (
     DEFAULT_MAX_UPLOADS_PER_SESSION,
     DEFAULT_MAX_FILE_SIZE_MB,
 )
+
+load_dotenv()
 
 class Settings:
     def __init__(self):

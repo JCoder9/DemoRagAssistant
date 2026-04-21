@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 from app.services.upload_service import UploadService
 from app.services.upload_tracker import UploadTracker
+from app.services.vector_store import VectorStore
 from app.settings import settings
 import logging
 
@@ -15,6 +16,9 @@ upload_tracker = UploadTracker(
 
 def get_upload_service():
     return UploadService()
+
+def get_vector_store():
+    return VectorStore()
 
 def get_session_id(request: Request) -> str:
     forwarded = request.headers.get("X-Forwarded-For")
@@ -53,4 +57,45 @@ async def upload_document(file: UploadFile = File(...), request: Request = None)
         raise
     except Exception as e:
         logger.error(f"Upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/documents/{filename}")
+async def delete_document(filename: str, request: Request = None):
+    try:
+        session_id = get_session_id(request)
+        
+        vector_store = get_vector_store()
+        removed_count = vector_store.remove_document(filename)
+        
+        if removed_count == 0:
+            raise HTTPException(status_code=404, detail=f"Document '{filename}' not found")
+        
+        # Save the updated index
+        vector_store.save_index()
+        
+        logger.info(f"Document removed for {session_id}: {filename} ({removed_count} chunks)")
+        
+        return {
+            "filename": filename,
+            "chunks_removed": removed_count,
+            "message": f"Successfully removed {filename}"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Delete error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/documents")
+async def list_documents():
+    try:
+        vector_store = get_vector_store()
+        files = vector_store.get_uploaded_files()
+        
+        return {
+            "files": files,
+            "count": len(files)
+        }
+    except Exception as e:
+        logger.error(f"List documents error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
