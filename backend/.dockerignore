@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Data
+storage/
+data/
+uploads/
+*.faiss
+*.pkl
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tests
+tests/
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+CPU_OPTIMIZATION.md
+run_tests_batched.sh
+run_tests_low_memory.sh
+switch_settings.sh
