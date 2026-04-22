@@ -347,6 +347,8 @@
 @media (max-width: 768px) {
   .chat-container {
     height: 90vh;
+    height: -webkit-fill-available;
+    height: 90dvh;
     border-radius: 12px;
   }
 
@@ -432,8 +434,8 @@
 
 @media (max-width: 480px) {
   .chat-container {
-    height: 100vh;
-    border-radius: 0;
+    height: 85vh;
+    border-radius: 10px;
     max-width: 100%;
   }
 

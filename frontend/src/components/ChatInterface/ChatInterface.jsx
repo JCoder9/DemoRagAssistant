@@ -18,6 +18,21 @@ function ChatInterface() {
   }
 
   useEffect(() => {
+    // Hide address bar on mobile: wait for page load, then scroll down and back up
+    const hideAddressBar = () => {
+      window.scrollTo(0, 1)
+      setTimeout(() => window.scrollTo(0, 0), 100)
+    }
+
+    if (document.readyState === 'complete') {
+      hideAddressBar()
+    } else {
+      window.addEventListener('load', hideAddressBar)
+      return () => window.removeEventListener('load', hideAddressBar)
+    }
+  }, [])
+
+  useEffect(() => {
     scrollToBottom()
   }, [messages, loading])
 
